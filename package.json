@@ -1,0 +1,28 @@
+{
+  "name": "bms-radio",
+  "version": "1.0.0",
+  "description": "Electron wrapper for be-music.surge.sh",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Hello world!\"",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skyventuree/bms-radio.git"
+  },
+  "author": "Rosetta Emerson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/skyventuree/bms-radio/issues"
+  },
+  "homepage": "https://github.com/skyventuree/bms-radio#readme",
+  "dependencies": {
+    "@electron/remote": "^2.0.1",
+    "discord-rpc": "^4.0.1"
+  },
+  "devDependencies": {
+    "electron": "^16.0.7",
+    "electron-packager": "^15.4.0"
+  }
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMS Radio Station</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="dragger">
+        <div id="window-controls">
+            <!-- Close button -->
+            <svg xmlns="http://www.w3.org/2000/svg" id="close-btn" width="24" height="24" viewBox="0 0 24 24"><path d="M23.954 21.03l-9.184-9.095 9.092-9.174-2.832-2.807-9.09 9.179-9.176-9.088-2.81 2.81 9.186 9.105-9.095 9.184 2.81 2.81 9.112-9.192 9.18 9.1z"/></svg>
+            
+            <!-- Minimize button -->
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="minimize-btn" version="1.1" width="24" height="24" viewBox="0 0 640 480" xml:space="preserve">
+                <g transform="matrix(4.48 0 0 0.32 318 220)"  >
+                    <polygon style="stroke: rgb(0,0,0); stroke-width: 4; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  points="-50,-50 -50,50 50,50 50,-50 " />
+                </g>
+            </svg>
+            
+            <!-- Reload icon -->
+            <svg version="1.1" id="reload-btn" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24" height="24" viewBox="0 0 457.234 457.234" style="enable-background:new 0 0 457.234 457.234;" xml:space="preserve">
+		        <path d="M456.092,216.482c-2.322-5.605-7.791-9.26-13.858-9.26H412.74C401.865,103.271,313.719,21.971,206.937,21.971
+			C92.831,21.971,0,114.802,0,228.907c0,108.662,84.185,198.031,190.758,206.31c4.167,0.324,8.28-1.108,11.349-3.945
+			c3.07-2.837,4.829-6.829,4.829-11.009v-70.358c0-7.582-5.64-13.94-13.166-14.868C140.994,328.53,100,283.416,100,228.907
+			c0-58.965,47.972-106.937,106.937-106.937c51.538,0,94.676,36.648,104.726,85.252h-26.149c-6.067,0-11.536,3.654-13.858,9.26
+			c-2.321,5.605-1.038,12.057,3.252,16.347l78.36,78.359c2.929,2.929,6.768,4.394,10.606,4.394c3.838,0,7.678-1.465,10.606-4.394
+			l78.36-78.359C457.13,228.539,458.413,222.088,456.092,216.482z"/>
+            </svg>
+
+
+
+        </div>
+    </div>
+
+    <div id="btn-bg-blocker">
+        <div id="play-btn" onclick="playStream()" class="blinking">
+            <!-- Play button -->
+            <svg
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:cc="http://creativecommons.org/ns#"
+                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                xmlns:svg="http://www.w3.org/2000/svg"
+                xmlns="http://www.w3.org/2000/svg"
+                id="play-icon"
+                version="1.1"
+                height="50"
+                width="50"
+                viewBox="0 0 1200 1200">
+            <path
+                d="M 600,1200 C 268.65,1200 0,931.35 0,600 0,268.65 268.65,0 600,0 c 331.35,0 600,268.65 600,600 0,331.35 -268.65,600 -600,600 z M 450,300.45 450,899.55 900,600 450,300.45 z"
+                id="path16995" />
+            </svg>
+    
+            <!-- Pause button -->
+            <svg
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:cc="http://creativecommons.org/ns#"
+                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                xmlns:svg="http://www.w3.org/2000/svg"
+                xmlns="http://www.w3.org/2000/svg"
+                id="pause-icon"
+                version="1.1"
+                height="50"
+                width="50"
+                viewBox="0 0 1200 1200"
+                style="display:none;">
+            <path
+                id="path15778"
+                d="M 600,0 C 268.62914,0 0,268.62914 0,600 c 0,331.37086 268.62914,600 600,600 331.37086,0 600,-268.62914 600,-600 C 1200,268.62914 931.37086,0 600,0 z m -269.16515,289.38 181.71397,0 0,621.24 -181.71397,0 0,-621.24 z m 356.61633,0 181.71399,0 0,621.24 -181.71399,0 0,-621.24 z" />
+            </svg>
+        </div>
+    </div>
+    <div id="song-info">
+        <p id="artist">Please stand by.</p>
+        <h1 id="song-title">[Loading song info...]</h1>
+        <p id="album-title"></p>
+        <p id="genre">Please stand by.</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
