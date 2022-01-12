@@ -51,7 +51,6 @@ bundleElectronApp({
     arch: ARCH,
     platform: PLATFORM,
     ignore: [
-        'node_modules',
         '.gitignore',
         'build.js',
         'builds'
@@ -61,5 +60,5 @@ bundleElectronApp({
     asar: true,
     prune: true,
     icon: 'iconset/logo',
-    appVersion: '1.0.0'
+    appVersion: '1.0.2'
 })
