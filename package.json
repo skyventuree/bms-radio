@@ -1,6 +1,6 @@
 {
   "name": "bms-radio",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Electron wrapper for be-music.surge.sh",
   "main": "app.js",
   "scripts": {

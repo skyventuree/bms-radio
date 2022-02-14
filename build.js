@@ -60,5 +60,8 @@ bundleElectronApp({
     asar: true,
     prune: true,
     icon: 'iconset/logo',
-    appVersion: '1.0.2'
+    appVersion: require('./package.json').version,
+    buildVersion: execute('git rev-parse --short HEAD', (output) => {
+        return output.slice(0, 6)
+    })
 })

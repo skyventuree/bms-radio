@@ -10,6 +10,7 @@ const createWindow = () => {
         resizable: false,
         fullscreen: false,
         autoHideMenuBar: true,
+        frame: false,
         titleBarStyle: "hiddenInset",
         webPreferences: {
             contextIsolation: false,
