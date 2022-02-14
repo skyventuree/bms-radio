@@ -1,6 +1,8 @@
 # bms-radio
 Electron wrapper for be-music.surge.sh.
 
+![BMS Radio Station on macOS](preview.png "BMS Radio Station on macOS")
+
 I wrote this app because the website version would stop playing for no reason and I also want to learn about Electron app. (Also Discord RPC is a plus!)
 
 # Download
