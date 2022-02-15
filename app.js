@@ -19,7 +19,7 @@ const createWindow = () => {
         }
 
     })
-    win.loadFile('index.html')
+    win.loadFile('app/index.html')
     require("@electron/remote/main").enable(win.webContents);
 }
 

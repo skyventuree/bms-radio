@@ -101,6 +101,17 @@ a:hover {
     }
 }
 
+/* make a marquee text class */
+.marquee {
+    animation: scroll 10s linear infinite;
+}
+
+@keyframes scroll {
+    0% { transform: translate(50%, 0); }
+    40%, 60% { transform: translate(0, 0); }
+    100% { transform: translate(-50%, 0); }
+}
+
 .blinking {
     animation: blinking 1s alternate infinite ease-in-out;
 }
@@ -120,6 +131,9 @@ a:hover {
     }
     a {
         color: black;
+    }
+    #runaway {
+        filter: invert(1);
     }
 }
 

@@ -4,14 +4,18 @@ const DiscordRPC = require("discord-rpc");
 const clientId = "930729620465143839";
 
 DiscordRPC.register(clientId);
-const rpc = new DiscordRPC.Client({ transport: 'ipc' });
+const rpc = new DiscordRPC.Client({
+    transport: 'ipc'
+});
 const startTimestamp = new Date();
 
 async function setStatus(details, state) {
     rpc.setActivity({
         details: details,
         state: state,
-        timestamps: {start: Date.now()},
+        timestamps: {
+            start: Date.now()
+        },
         assets: {
             large_image: "logo",
             large_text: "Listening to BMS",
@@ -30,18 +34,18 @@ var connectionAttempt = 0
 var ping;
 
 // establish and handling websocket
-metadata.onopen = function(e) {
+metadata.onopen = function (e) {
     console.info("Metadata socket established. Awaiting messages...");
     ping = setInterval(() => {
         metadata.send("0"); // ping every 1 minute to keep the connection alive
     }, 60000);
 }
 
-metadata.onclose = function(event) {
+metadata.onclose = function (event) {
     console.info(`Connection closed: ${event.code} ${event.reason}`)
     clearInterval(ping)
 }
-metadata.onerror = function(e) {
+metadata.onerror = function (e) {
     console.error("Oops! Something happened.")
     console.error(e.message)
     connectionAttempt++
@@ -59,10 +63,10 @@ if ('mediaSession' in navigator) {
     var md_session = navigator.mediaSession;
 }
 
-md_session.setActionHandler('play', function(e) {
+md_session.setActionHandler('play', function (e) {
 
 });
-md_session.setActionHandler('pause', playStream("pause")); 
+md_session.setActionHandler('pause', playStream("pause"));
 
 metadata.addEventListener('message', function (event) {
     if (_ == false && JSON.parse(event.data)["d"]["d"]["h"] == "s-usc1c-nss-332.firebaseio.com") { // send data to the websocket if contain this header
@@ -71,18 +75,18 @@ metadata.addEventListener('message', function (event) {
         _ = true
         return
     }
-    
+
     // ignore if event.data is not a valid JSON
     if (event.data.indexOf("{") == -1) return
-    
+
     var content = JSON.parse(event.data)["d"];
     // OK status got sent after the song info for the first time
     // so this will (hopefully) ignore it
     if (_ == true && content["b"]["s"] == "ok") {
         console.info("Connection OK")
-        
+        return
     }
-    
+
     // getting and assigning metadata
     if (_ == true && content["b"]["p"] == "station") {
         let songinfo = content["b"]["d"];
@@ -104,7 +108,9 @@ metadata.addEventListener('message', function (event) {
         }
         setStatus(`${songinfo.artist} - ${songinfo.title}`, eventTitle);
     }
-});   
+    checkOverflow();
+
+});
 
 if (navigator.mediaSession.playbackState == "none") navigator.mediaSession.playbackState = 'paused';
 
@@ -119,8 +125,7 @@ function playStream(state) {
         document.querySelector("#play-btn").classList.remove("blinking");
         navigator.mediaSession.playbackState = 'playing'
         console.info("Audio is playing.")
-    }
-    else if ((state == "pause" || !bmstream.paused) && navigator.mediaSession.playbackState == 'playing') {
+    } else if ((state == "pause" || !bmstream.paused) && navigator.mediaSession.playbackState == 'playing') {
         bmstream.pause();
         document.querySelector("#play-icon").style.display = "inline";
         document.querySelector("#pause-icon").style.display = "none";
@@ -129,7 +134,9 @@ function playStream(state) {
     }
 }
 
-bmstream.addEventListener('loadeddata',function(){if(bmstream.readyState >= 2)playStream("play")})
+bmstream.addEventListener('loadeddata', function () {
+    if (bmstream.readyState >= 2) playStream("play")
+})
 
 // Space to play/pause
 window.addEventListener("keydown", function (event) {
@@ -137,9 +144,15 @@ window.addEventListener("keydown", function (event) {
 }, true);
 
 // window buttons
-document.getElementById("close-btn").onclick = function() {BrowserWindow.getFocusedWindow().close()}
-document.getElementById("minimize-btn").onclick = function() {BrowserWindow.getFocusedWindow().minimize()}
-document.getElementById("reload-btn").onclick = function() {window.location.reload()}
+document.getElementById("close-btn").onclick = function () {
+    BrowserWindow.getFocusedWindow().close()
+}
+document.getElementById("minimize-btn").onclick = function () {
+    BrowserWindow.getFocusedWindow().minimize()
+}
+document.getElementById("reload-btn").onclick = function () {
+    window.location.reload()
+}
 
 // window decoration
 if (navigator.userAgent.toUpperCase().indexOf('MAC') >= 0) {
@@ -155,4 +168,16 @@ document.body.addEventListener('click', event => {
     }
 });
 
-rpc.login({ clientId }).catch(console.error);
+// discord rpc handling
+rpc.login({
+    clientId
+}).catch(console.error);
+
+// check if #song-title is overflowing 
+function checkOverflow() {
+    if (document.querySelector("#song-title").offsetWidth > (window.innerWidth - document.querySelector("#btn-bg-blocker").offsetWidth)) {
+        document.querySelector("#song-title").classList.add("marquee");
+    } else {
+        document.querySelector("#song-title").classList.remove("marquee");
+    }
+}
