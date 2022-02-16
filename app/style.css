@@ -15,6 +15,33 @@ a:hover {
     text-decoration: underline;
 }
 
+#no-internet {
+    position: absolute;
+    visibility: hidden;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+#no-internet > img {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+}
+
+#no-internet > #no-internet-text {
+    position: fixed;
+    text-align: center;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+}
+
 #runaway {
     position: fixed;
     bottom: 0;
@@ -33,7 +60,7 @@ a:hover {
     height: 40px;
     -webkit-app-region: drag;
     background-color: transparent;
-    z-index: 5;
+    z-index: 20;
 }
 
 #window-controls > * {
@@ -41,6 +68,11 @@ a:hover {
     margin-right: 15px;
     -webkit-app-region: no-drag;
     transition: 0.1s opacity ease-in-out;
+}
+
+#window-controls > #try-reload {
+    visibility: hidden;
+    margin-top: 0;
 }
 
 #window-controls > *:hover {
@@ -135,6 +167,9 @@ a:hover {
     #runaway {
         filter: invert(1);
     }
+    #no-internet {
+        background-color: white;
+    }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -147,6 +182,12 @@ a:hover {
     }
     a {
         color: white;
+    }
+    #no-internet {
+        background-color: #242930;
+    }
+    #no-internet > img {
+        filter: invert(1);
     }
 }
 

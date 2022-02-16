@@ -46,17 +46,13 @@ metadata.onclose = function (event) {
     clearInterval(ping)
 }
 metadata.onerror = function (e) {
-    console.error("Oops! Something happened.")
+    console.error("Oops! Couldn't connect to database server.")
     console.error(e.message)
-    connectionAttempt++
-    console.error("Attempting to reopen WebSocket connection... Attempt #" + connectionAttempt)
-    setTimeout(() => {
-        metadata = new WebSocket("wss://s-usc1c-nss-351.firebaseio.com/.ws?v=5");
-    }, 5000);
+    document.getElementById("no-internet").style.visibility = "visible";
 }
 
 // metadata handling (emulated the same thing be-music.surge.sh did)
-var _ = false // avoid getting spitted a ton of error to the console. better fix this soon.
+var _ = false // avoid getting spitted a ton of error to the console. there is a better way to do this.
 let eventTitle, eventUrl;
 
 if ('mediaSession' in navigator) {
@@ -69,48 +65,68 @@ md_session.setActionHandler('play', function (e) {
 md_session.setActionHandler('pause', playStream("pause"));
 
 metadata.addEventListener('message', function (event) {
-    if (_ == false && JSON.parse(event.data)["d"]["d"]["h"] == "s-usc1c-nss-332.firebaseio.com") { // send data to the websocket if contain this header
-        metadata.send(`{"t":"d","d":{"r":1,"a":"s","b":{"c":{"sdk.js.6-5-0":1}}}}`)
-        metadata.send(`{"t":"d","d":{"r":2,"a":"q","b":{"p":"/station","h":""}}}`)
-        _ = true
-        return
-    }
-
-    // ignore if event.data is not a valid JSON
-    if (event.data.indexOf("{") == -1) return
-
-    var content = JSON.parse(event.data)["d"];
-    // OK status got sent after the song info for the first time
-    // so this will (hopefully) ignore it
-    if (_ == true && content["b"]["s"] == "ok") {
-        console.info("Connection OK")
-        return
-    }
-
-    // getting and assigning metadata
-    if (_ == true && content["b"]["p"] == "station") {
-        let songinfo = content["b"]["d"];
-        eventTitle = songinfo.eventTitle || eventTitle;
-        eventUrl = songinfo.eventUrl || eventUrl;
-        document.querySelector("#artist").innerText = songinfo.artist;
-        document.querySelector("#song-title").innerHTML = `<a href="${songinfo.entryUrl}">${songinfo.title}</a>`;
-        document.querySelector("#album-title").innerHTML = `<a href="${eventUrl}">${eventTitle}</a>`;
-        document.querySelector("#genre").innerText = "Genre: " + songinfo.genre;
-
-        // set metadata for the media overlay, will break if the player is paused then played.
-        if ('mediaSession' in navigator) {
-            let media = new MediaMetadata({
-                title: songinfo.title,
-                artist: songinfo.artist,
-                album: eventTitle
-            });
-            md_session.metadata = media;
+    try {
+        // ignore if event.data is not a valid JSON
+        if (event.data.indexOf("{") == -1) return;
+    
+        // first time initialization
+        if (_ == false && JSON.parse(event.data)["d"]["d"]["h"] == "s-usc1c-nss-332.firebaseio.com") { // send data to the websocket if contain this header
+            metadata.send(`{"t":"d","d":{"r":1,"a":"s","b":{"c":{"sdk.js.6-5-0":1}}}}`)
+            metadata.send(`{"t":"d","d":{"r":2,"a":"q","b":{"p":"/station","h":""}}}`)
+            _ = true
+            console.info("Websocket ready!")
+            return
         }
-        setStatus(`${songinfo.artist} - ${songinfo.title}`, eventTitle);
+        
+        // temporary solution since the first data got sent missing some brackets
+        try {
+            var content = JSON.parse(event.data)["d"];
+        }
+        catch (e) {
+            if(e == SyntaxError) {
+                var content = JSON.parse(`{event.data} + "}}}}`)["d"];
+            }
+        }
+
+        // OK status got sent after the song info for the first time
+        // so this will (hopefully) ignore it
+        if (_ == true && content["b"]["s"] == "ok") {
+            console.info("Connection OK")
+            return
+        }
+    
+        // getting and assigning metadata
+        if (_ == true && content["b"]["p"] == "station") {
+            let songinfo = content["b"]["d"];
+            eventTitle = songinfo.eventTitle || eventTitle;
+            eventUrl = songinfo.eventUrl || eventUrl;
+            document.querySelector("#artist").innerText = songinfo.artist;
+            document.querySelector("#song-title").innerHTML = `<a href="${songinfo.entryUrl}">${songinfo.title}</a>`;
+            document.querySelector("#album-title").innerHTML = `<a href="${eventUrl}">${eventTitle}</a>`;
+            document.querySelector("#genre").innerText = "Genre: " + songinfo.genre;
+    
+            // set metadata for the media overlay, will break if the player is paused then played.
+            if ('mediaSession' in navigator) {
+                let media = new MediaMetadata({
+                    title: songinfo.title,
+                    artist: songinfo.artist,
+                    album: eventTitle
+                });
+                md_session.metadata = media;
+            }
+            setStatus(`${songinfo.artist} - ${songinfo.title}`, eventTitle);
+        }
+        checkOverflow();
     }
-    checkOverflow();
+    catch (e) {
+        console.log(e)
+    }
+
+        
+
 
 });
+
 
 if (navigator.mediaSession.playbackState == "none") navigator.mediaSession.playbackState = 'paused';
 
