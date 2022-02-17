@@ -49,6 +49,8 @@ metadata.onerror = function (e) {
     console.error("Oops! Couldn't connect to database server.")
     console.error(e.message)
     document.getElementById("no-internet").style.visibility = "visible";
+    document.getElementById("try-reload").style.visibility = "visible";
+
 }
 
 // metadata handling (emulated the same thing be-music.surge.sh did)
@@ -59,16 +61,27 @@ if ('mediaSession' in navigator) {
     var md_session = navigator.mediaSession;
 }
 
-md_session.setActionHandler('play', function (e) {
-
-});
+md_session.setActionHandler('play', function (e) {});
 md_session.setActionHandler('pause', playStream("pause"));
+
+var splitData = 0;
+var dataNext = "";
 
 metadata.addEventListener('message', function (event) {
     try {
-        // ignore if event.data is not a valid JSON
-        if (event.data.indexOf("{") == -1) return;
-    
+
+        // webserver might send a number indicates the amount of splitted data
+        if (!isNaN(event.data) && Number(event.data) > 0) {
+            console.log("Splitted data received.")
+            splitData = Number(event.data);
+            return;
+        }
+        
+        // pass this check if splitData is larger than 0
+        if (splitData <= 0 && !event.data.startsWith("{")) return
+
+        var content;
+        
         // first time initialization
         if (_ == false && JSON.parse(event.data)["d"]["d"]["h"] == "s-usc1c-nss-332.firebaseio.com") { // send data to the websocket if contain this header
             metadata.send(`{"t":"d","d":{"r":1,"a":"s","b":{"c":{"sdk.js.6-5-0":1}}}}`)
@@ -78,16 +91,15 @@ metadata.addEventListener('message', function (event) {
             return
         }
         
-        // temporary solution since the first data got sent missing some brackets
-        try {
-            var content = JSON.parse(event.data)["d"];
+        if (splitData > 0) {
+            dataNext += event.data;
+            if (splitData == 1) content = JSON.parse(dataNext)["d"]; // if the last data, parse it
+            splitData--;
+            if (splitData > 0) return;
+        } else {
+            content = JSON.parse(event.data)["d"]
         }
-        catch (e) {
-            if(e == SyntaxError) {
-                var content = JSON.parse(`{event.data} + "}}}}`)["d"];
-            }
-        }
-
+    
         // OK status got sent after the song info for the first time
         // so this will (hopefully) ignore it
         if (_ == true && content["b"]["s"] == "ok") {
@@ -119,11 +131,8 @@ metadata.addEventListener('message', function (event) {
         checkOverflow();
     }
     catch (e) {
-        console.log(e)
+        console.error(e)
     }
-
-        
-
 
 });
 
@@ -191,7 +200,7 @@ rpc.login({
 
 // check if #song-title is overflowing 
 function checkOverflow() {
-    if (document.querySelector("#song-title").offsetWidth > (window.innerWidth - document.querySelector("#btn-bg-blocker").offsetWidth)) {
+    if (document.querySelector("#song-title > a").offsetWidth > (window.innerWidth - document.querySelector("#btn-bg-blocker").offsetWidth)) {
         document.querySelector("#song-title").classList.add("marquee");
     } else {
         document.querySelector("#song-title").classList.remove("marquee");
