@@ -28,9 +28,8 @@ async function setStatus(details, state) {
     });
 }
 
-var bmstream = new Audio("https://be-music.spacet.me/radio/be-music-surge");
+var bmStream = new Audio("https://be-music.spacet.me/radio/be-music-surge");
 var metadata = new WebSocket("wss://be-music-surge-frontend.firebaseio.com/.ws?v=5");
-var connectionAttempt = 0
 var ping;
 
 // establish and handling websocket
@@ -50,11 +49,10 @@ metadata.onerror = function (e) {
     console.error(e.message)
     document.getElementById("no-internet").style.visibility = "visible";
     document.getElementById("try-reload").style.visibility = "visible";
-
 }
 
 // metadata handling (emulated the same thing be-music.surge.sh did)
-var _ = false // avoid getting spitted a ton of error to the console. there is a better way to do this.
+var firstConnection = false // avoid getting spitted a ton of error to the console. there should be a better way to handle this.
 let eventTitle, eventUrl;
 
 if ('mediaSession' in navigator) {
@@ -71,6 +69,7 @@ metadata.addEventListener('message', function (event) {
     try {
 
         // webserver might send a number indicates the amount of splitted data
+        // handle them correctly before the data is parsed
         if (!isNaN(event.data) && Number(event.data) > 0) {
             console.log("Splitted data received.")
             splitData = Number(event.data);
@@ -80,17 +79,18 @@ metadata.addEventListener('message', function (event) {
         // pass this check if splitData is larger than 0
         if (splitData <= 0 && !event.data.startsWith("{")) return
 
-        var content;
         
         // first time initialization
-        if (_ == false && JSON.parse(event.data)["d"]["d"]["h"] == "s-usc1c-nss-332.firebaseio.com") { // send data to the websocket if contain this header
+        if (firstConnection == false && JSON.parse(event.data)["d"]["d"]["h"] == "s-usc1c-nss-331.firebaseio.com") {
             metadata.send(`{"t":"d","d":{"r":1,"a":"s","b":{"c":{"sdk.js.6-5-0":1}}}}`)
             metadata.send(`{"t":"d","d":{"r":2,"a":"q","b":{"p":"/station","h":""}}}`)
-            _ = true
+            firstConnection = true
             console.info("Websocket ready!")
             return
         }
         
+        var content;
+
         if (splitData > 0) {
             dataNext += event.data;
             if (splitData == 1) content = JSON.parse(dataNext)["d"]; // if the last data, parse it
@@ -102,13 +102,13 @@ metadata.addEventListener('message', function (event) {
     
         // OK status got sent after the song info for the first time
         // so this will (hopefully) ignore it
-        if (_ == true && content["b"]["s"] == "ok") {
+        if (firstConnection == true && content["b"]["s"] == "ok") {
             console.info("Connection OK")
             return
         }
     
         // getting and assigning metadata
-        if (_ == true && content["b"]["p"] == "station") {
+        if (firstConnection == true && content["b"]["p"] == "station") {
             let songinfo = content["b"]["d"];
             eventTitle = songinfo.eventTitle || eventTitle;
             eventUrl = songinfo.eventUrl || eventUrl;
@@ -143,15 +143,15 @@ if (navigator.mediaSession.playbackState == "none") navigator.mediaSession.playb
 function playStream(state) {
     console.log("playStream() called.")
     state = state | "";
-    if (bmstream.readyState >= 2 && (state == "play" || bmstream.paused) && navigator.mediaSession.playbackState == 'paused') {
-        bmstream.play();
+    if (bmStream.readyState >= 2 && (state == "play" || bmStream.paused) && navigator.mediaSession.playbackState == 'paused') {
+        bmStream.play();
         document.querySelector("#play-icon").style.display = "none";
         document.querySelector("#pause-icon").style.display = "inline";
         document.querySelector("#play-btn").classList.remove("blinking");
         navigator.mediaSession.playbackState = 'playing'
         console.info("Audio is playing.")
-    } else if ((state == "pause" || !bmstream.paused) && navigator.mediaSession.playbackState == 'playing') {
-        bmstream.pause();
+    } else if ((state == "pause" || !bmStream.paused) && navigator.mediaSession.playbackState == 'playing') {
+        bmStream.pause();
         document.querySelector("#play-icon").style.display = "inline";
         document.querySelector("#pause-icon").style.display = "none";
         navigator.mediaSession.playbackState = 'paused'
@@ -159,8 +159,8 @@ function playStream(state) {
     }
 }
 
-bmstream.addEventListener('loadeddata', function () {
-    if (bmstream.readyState >= 2) playStream("play")
+bmStream.addEventListener('loadeddata', function () {
+    if (bmStream.readyState >= 2) playStream("play")
 })
 
 // Space to play/pause
