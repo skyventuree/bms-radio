@@ -81,7 +81,7 @@ metadata.addEventListener('message', function (event) {
 
         
         // first time initialization
-        if (firstConnection == false && JSON.parse(event.data)["d"]["d"]["h"] == "s-usc1c-nss-331.firebaseio.com") {
+        if (firstConnection == false && JSON.parse(event.data)["d"]["d"]["h"].includes("firebaseio.com")) {
             metadata.send(`{"t":"d","d":{"r":1,"a":"s","b":{"c":{"sdk.js.6-5-0":1}}}}`)
             metadata.send(`{"t":"d","d":{"r":2,"a":"q","b":{"p":"/station","h":""}}}`)
             firstConnection = true
